@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UrlShortener.Models;
+using UrlShortener.Services;
 
 namespace UrlShortener.Controllers
 {
@@ -12,9 +13,10 @@ namespace UrlShortener.Controllers
     [Route("[controller]")]
     public class UrlShortenerController : ControllerBase
     {
-        public UrlShortenerController()
+        private readonly IUrlShortenerService _service;
+        public UrlShortenerController(IUrlShortenerService service)
         {
-
+            _service = service;
         }
 
         [HttpPost]
@@ -29,7 +31,9 @@ namespace UrlShortener.Controllers
                 return BadRequest("URL is invalid");
             }
 
-            return new OkObjectResult(request.LongUrl);
+            var response = _service.Add(request.LongUrl);
+
+            return new OkObjectResult(response);
         }
         [HttpGet("/url/{code}")]
         public IActionResult GetLongUrl([FromRoute] string code)

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UrlShortener.Services;
 
 namespace UrlShortener
 {
@@ -32,6 +33,8 @@ namespace UrlShortener
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "UrlShortener", Version = "v1" });
             });
+
+            services.AddSingleton<IUrlShortenerService, UrlShortenerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
