@@ -20,6 +20,15 @@ namespace UrlShortener.Controllers
         [HttpPost]
         public IActionResult ShortenURL([FromBody] UrlRequest request)
         {
+            if (!Uri.TryCreate(request.LongUrl, UriKind.Absolute, out var outputUri))
+            {
+                return BadRequest("URL is invalid");
+            }
+            if (outputUri.Scheme != Uri.UriSchemeHttp && outputUri.Scheme != Uri.UriSchemeHttps && outputUri.Scheme != Uri.UriSchemeFtp)
+            {
+                return BadRequest("URL is invalid");
+            }
+
             return new OkObjectResult(request.LongUrl);
         }
         [HttpGet("/url/{code}")]
