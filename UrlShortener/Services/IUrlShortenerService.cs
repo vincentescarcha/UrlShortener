@@ -10,6 +10,8 @@ namespace UrlShortener.Services
     {
         UrlResponse Add(string longUrl);
         bool LongUrlExist(string longUrl);
-        UrlResponse GetByUrl(string longUrl);
+        UrlResponse GetByLongUrl(string longUrl);
+        string GetByShortUrl(string shortUrlCode);
+        bool ShortUrlExist(string shortUrlCode);
     }
 }

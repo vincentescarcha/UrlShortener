@@ -15,11 +15,43 @@ namespace UrlShortener.Services
         {
             _context = context;
         }
+
+        public string GetByShortUrl(string shortUrlCode)
+        {
+            int id = Decode(shortUrlCode);
+            var urlData = GetById(id);
+
+            return urlData.LongUrl;
+        }
+        private UrlData GetById(int id)
+        {
+            var urlData = _context.Urls.FirstOrDefault(x => x.Id == id);
+
+            return urlData;
+        }
+
+        public bool ShortUrlExist(string shortUrlCode)
+        {
+            try
+            {
+                int id = Decode(shortUrlCode);
+                return IdExist(id);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        private bool IdExist(int id)
+        {
+            return _context.Urls.Any(x => x.Id == id);
+        }
+
         public bool LongUrlExist(string longUrl)
         {
             return _context.Urls.Any(x => x.LongUrl == longUrl);
         }
-        public UrlResponse GetByUrl(string longUrl)
+        public UrlResponse GetByLongUrl(string longUrl)
         {
             var urlData = _context.Urls.FirstOrDefault(x => x.LongUrl == longUrl);
 

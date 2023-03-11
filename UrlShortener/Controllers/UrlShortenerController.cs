@@ -33,7 +33,7 @@ namespace UrlShortener.Controllers
 
             if (_service.LongUrlExist(request.LongUrl))
             {
-                return new OkObjectResult(_service.GetByUrl(request.LongUrl));
+                return new OkObjectResult(_service.GetByLongUrl(request.LongUrl));
             }
 
             var response = _service.Add(request.LongUrl);
@@ -43,7 +43,14 @@ namespace UrlShortener.Controllers
         [HttpGet("/url/{code}")]
         public IActionResult GetLongUrl([FromRoute] string code)
         {
-            return new OkObjectResult(code);
+            if (!_service.ShortUrlExist(code))
+            {
+                return new NotFoundObjectResult("Url not found");
+            }
+
+            var urlData = _service.GetByShortUrl(code);
+
+            return new RedirectResult(urlData);
         }
     }
 }
