@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace UrlShortener.Models
 {
-    public class UrlReponse
+    public class UrlResponse
     {
         public string ShortUrl { get; set; }
     }
