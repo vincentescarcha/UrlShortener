@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,11 @@ namespace UrlShortener.Services
     public class UrlShortenerService : IUrlShortenerService
     {
         private readonly ApplicationDbContext _context;
-        public UrlShortenerService(ApplicationDbContext context)
+        private readonly HttpContext _httpContext;
+        public UrlShortenerService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContext = httpContextAccessor.HttpContext;
         }
 
         public string GetByShortUrl(string shortUrlCode)
@@ -26,8 +29,14 @@ namespace UrlShortener.Services
         private UrlData GetById(int id)
         {
             var urlData = _context.Urls.FirstOrDefault(x => x.Id == id);
+            AddHit(urlData);
 
             return urlData;
+        }
+        private void AddHit(UrlData urlData)
+        {
+            urlData.Hits++;
+            _context.SaveChanges();
         }
 
         public bool ShortUrlExist(string shortUrlCode)
@@ -55,10 +64,7 @@ namespace UrlShortener.Services
         {
             var urlData = _context.Urls.FirstOrDefault(x => x.LongUrl == longUrl);
 
-            return new UrlResponse()
-            {
-                ShortUrl = Encode(urlData.Id)
-            };
+            return Map(urlData);
         }
 
         public UrlResponse Add(string longUrl)
@@ -69,17 +75,26 @@ namespace UrlShortener.Services
             };
             _context.Add(urlData);
             _context.SaveChanges();
+            return Map(urlData);
+        }
 
+        private UrlResponse Map(UrlData urlData)
+        {
             return new UrlResponse()
             {
-                ShortUrl = Encode(urlData.Id)
+                ShortUrl = BuildShortUrl(urlData.Id)
             };
         }
-        private string Encode(int id)
+
+        private string BuildShortUrl(int id)
+        {
+            return $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}/url/" + Encode(id);
+        }
+        private static string Encode(int id)
         {
             return WebEncoders.Base64UrlEncode(BitConverter.GetBytes(id));
         }
-        private int Decode(string urlCode)
+        private static int Decode(string urlCode)
         {
             return BitConverter.ToInt32(WebEncoders.Base64UrlDecode(urlCode));
         }
