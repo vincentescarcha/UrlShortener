@@ -31,6 +31,11 @@ namespace UrlShortener.Controllers
                 return BadRequest("URL is invalid");
             }
 
+            if (_service.LongUrlExist(request.LongUrl))
+            {
+                return new OkObjectResult(_service.GetByUrl(request.LongUrl));
+            }
+
             var response = _service.Add(request.LongUrl);
 
             return new OkObjectResult(response);

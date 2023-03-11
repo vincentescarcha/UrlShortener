@@ -9,5 +9,7 @@ namespace UrlShortener.Services
     public interface IUrlShortenerService
     {
         UrlResponse Add(string longUrl);
+        bool LongUrlExist(string longUrl);
+        UrlResponse GetByUrl(string longUrl);
     }
 }

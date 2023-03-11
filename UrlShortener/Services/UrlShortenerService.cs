@@ -11,6 +11,21 @@ namespace UrlShortener.Services
     public class UrlShortenerService : IUrlShortenerService
     {
         public static List<UrlData> Urls = new List<UrlData>();
+
+        public bool LongUrlExist(string longUrl)
+        {
+            return Urls.Any(x => x.LongUrl == longUrl);
+        }
+        public UrlResponse GetByUrl(string longUrl)
+        {
+            var urlData = Urls.FirstOrDefault(x => x.LongUrl == longUrl);
+
+            return new UrlResponse()
+            {
+                ShortUrl = Encode(urlData.Id)
+            };
+        }
+
         public UrlResponse Add(string longUrl)
         {
             var urlData = new UrlData()
