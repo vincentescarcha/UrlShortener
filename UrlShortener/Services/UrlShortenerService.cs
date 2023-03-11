@@ -10,15 +10,18 @@ namespace UrlShortener.Services
 {
     public class UrlShortenerService : IUrlShortenerService
     {
-        public static List<UrlData> Urls = new List<UrlData>();
-
+        private readonly ApplicationDbContext _context;
+        public UrlShortenerService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
         public bool LongUrlExist(string longUrl)
         {
-            return Urls.Any(x => x.LongUrl == longUrl);
+            return _context.Urls.Any(x => x.LongUrl == longUrl);
         }
         public UrlResponse GetByUrl(string longUrl)
         {
-            var urlData = Urls.FirstOrDefault(x => x.LongUrl == longUrl);
+            var urlData = _context.Urls.FirstOrDefault(x => x.LongUrl == longUrl);
 
             return new UrlResponse()
             {
@@ -30,10 +33,10 @@ namespace UrlShortener.Services
         {
             var urlData = new UrlData()
             {
-                Id = Urls.Count + 1,
-                LongUrl = longUrl,
+                LongUrl = longUrl
             };
-            Urls.Add(urlData);
+            _context.Add(urlData);
+            _context.SaveChanges();
 
             return new UrlResponse()
             {
